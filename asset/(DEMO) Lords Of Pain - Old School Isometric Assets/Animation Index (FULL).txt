@@ -1,0 +1,99 @@
+-------------------------------------------------
+warrior_
+-------------------------------------------------
+
+	default_
+
+warrior_default_idle
+warrior_default_walk
+
+	armed_
+
+warrior_armed_idle
+warrior_armed_walk
+warrior_armed_attack
+
+	special_
+
+warrior_special_select
+warrior_special_death
+
+-------------------------------------------------
+knight_
+-------------------------------------------------
+
+	default_
+
+knight_default_idle
+knight_default_walk
+
+	armed_
+
+knight_armed_idle
+knight_armed_walk
+knight_armed_attack
+
+	special_
+
+knight_special_select
+knight_special_death
+
+-------------------------------------------------
+fighter_
+-------------------------------------------------
+
+	default_
+
+fighter_default_idle
+fighter_default_walk
+
+	armed_
+
+fighter_armed_idle
+fighter_armed_walk
+fighter_armed_attack
+
+	special_
+
+fighter_special_select
+fighter_special_death
+
+-------------------------------------------------
+subservient_
+-------------------------------------------------
+
+	special_
+
+subservient_special_working
+subservient_special_worship
+
+-------------------------------------------------
+skeleton_
+-------------------------------------------------
+
+	default_
+
+skeleton_default_idle
+skeleton_default_walk
+skeleton_default_attack
+
+	special_
+
+skeleton_special_death
+
+-------------------------------------------------
+demonlord_
+-------------------------------------------------
+
+	default_
+
+demonlord_default_idle
+demonlord_default_walk
+demonlord_default_attack1
+demonlord_default_attack2
+
+	special_
+
+demonlord_special_intro
+demonlord_special_laugh
+demonlord_special_death

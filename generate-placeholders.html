@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Placeholder Images</title>
+</head>
+<body>
+    <h1>Generating placeholder images...</h1>
+    <canvas id="canvas" width="32" height="32" style="border:1px solid black;"></canvas>
+    <script>
+        // Function to generate a placeholder image
+        function generatePlaceholder(name, color, symbol) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Fill background
+            ctx.fillStyle = color;
+            ctx.fillRect(4, 4, 24, 24);
+            
+            // Draw symbol
+            if (symbol) {
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(symbol, 16, 16);
+            }
+            
+            // Convert to data URL
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Generate placeholders
+        const placeholders = [
+            { name: 'health_potion', color: '#e74c3c', symbol: '♥' },
+            { name: 'mana_potion', color: '#3498db', symbol: '♦' },
+            { name: 'fireball', color: 'orange', symbol: '✧' }
+        ];
+        
+        // Create download links
+        placeholders.forEach(p => {
+            const dataUrl = generatePlaceholder(p.name, p.color, p.symbol);
+            
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = p.name + '.png';
+            link.textContent = 'Download ' + p.name;
+            link.style.display = 'block';
+            link.style.margin = '10px';
+            document.body.appendChild(link);
+            
+            // Auto-click to download
+            link.click();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+Playable Character
+	Warrior
+	Knight
+	Fighter
+
+Non-Playable Character
+	Subservient
+
+Boss
+	Demonlord
+	
+Enemy
+	Skeleton
+
+User Interface
+	Cursor Gauntlet x5
+	Filter Vignette
+	Highlight x5
+	Loot Indicator x5
+
+Prop
+	Bones x3
+	Rocks
+	Mushrooms
+	Barrel + Break
+	Gold Drop
+	Wall x3
+	Tiles
+	Column x2
+	Bricks
+	Crate + Break
+	Gemstones x4
+	Brazier + Lit + Break
+	Torch
+
+Visual Effect
+	Zone
+	Glint
+	Flame + Glow
+	Flames + Glow
+	Glow
+	Swoosh
+
+Environment
+	Ground Stone
+	Ground Variation x2
+	Ground Darken
