@@ -1,0 +1,195 @@
+#gameUI {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+}
+
+#hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.health-mana {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.bar-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar {
+    width: 200px;
+    height: 20px;
+    border: 2px solid #333;
+    background: #111;
+    position: relative;
+}
+
+.bar.health::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #ff4444;
+    width: var(--fill, 100%);
+}
+
+.bar.mana::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #4444ff;
+    width: var(--fill, 100%);
+}
+
+.bar.exp::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #ffaa00;
+    width: var(--fill, 0%);
+}
+
+.bar-text {
+    color: #fff;
+    font-size: 12px;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.character-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.hotkeys {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.hotkey-slot {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #00ff88;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00ff88;
+    font-size: 12px;
+}
+
+#miniMap {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 200px;
+    height: 200px;
+    border: 2px solid #00ff88;
+    background: rgba(0, 0, 0, 0.8);
+    pointer-events: auto;
+}
+
+#miniMapCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+.panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    min-height: 300px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ff88;
+    color: #fff;
+    pointer-events: auto;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(0, 255, 136, 0.2);
+    border-bottom: 1px solid #00ff88;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #00ff88;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 40px);
+    gap: 2px;
+    padding: 15px;
+}
+
+.inventory-slot {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #333;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.inventory-stats {
+    padding: 15px;
+    border-top: 1px solid #333;
+    font-size: 14px;
+}
+
+.character-sheet {
+    padding: 15px;
+    display: flex;
+    gap: 20px;
+}
+
+.equipment-slots {
+    display: grid;
+    grid-template-columns: repeat(2, 60px);
+    gap: 10px;
+}
+
+.equipment-slot {
+    width: 60px;
+    height: 60px;
+    border: 2px solid #333;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.stats-display {
+    flex: 1;
+}
+
+.stat {
+    margin-bottom: 10px;
+    font-size: 14px;
+}

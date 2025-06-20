@@ -1,0 +1,69 @@
+@media (max-width: 768px) {
+    .menu-screen h1 {
+        font-size: 2.5rem;
+    }
+    
+    .menu-buttons button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    #hud {
+        top: 10px;
+        left: 10px;
+    }
+    
+    .bar {
+        width: 150px;
+        height: 16px;
+    }
+    
+    .bar-text {
+        font-size: 10px;
+    }
+    
+    #miniMap {
+        width: 120px;
+        height: 120px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .panel {
+        width: 90vw;
+        max-width: 350px;
+    }
+    
+    .hotkeys {
+        flex-wrap: wrap;
+    }
+    
+    .hotkey-slot {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .loading-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .progress-bar {
+        width: 250px;
+    }
+    
+    .character-sheet {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .equipment-slots {
+        grid-template-columns: repeat(4, 50px);
+    }
+    
+    .equipment-slot {
+        width: 50px;
+        height: 50px;
+    }
+}

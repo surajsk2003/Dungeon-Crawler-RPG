@@ -1,0 +1,41 @@
+{
+    "name": "dungeon-crawler-rpg",
+    "version": "1.0.0",
+    "description": "A browser-based procedural dungeon crawler RPG built with HTML5 Canvas",
+    "main": "index.html",
+    "scripts": {
+        "start": "npx live-server --host=localhost --port=3000 --open=/",
+        "build": "node scripts/build.js",
+        "build-advanced": "npm run minify && npm run optimize-assets",
+        "minify": "npm run minify-js && npm run minify-css",
+        "minify-js": "npx terser js/*.js --compress --mangle --output=dist/game.min.js",
+        "minify-css": "npx clean-css-cli css/*.css -o dist/styles.min.css",
+        "optimize-assets": "npm run optimize-images && npm run optimize-audio",
+        "optimize-images": "npx imagemin assets/**/*.{jpg,png,gif} --out-dir=dist/assets",
+        "optimize-audio": "cp -r assets/music assets/sounds dist/assets/",
+        "cleanup": "node scripts/cleanup-assets.js",
+        "deploy": "node scripts/deploy.js",
+        "deploy-github": "node scripts/deploy.js github-pages",
+        "deploy-netlify": "node scripts/deploy.js netlify",
+        "deploy-manual": "node scripts/deploy.js manual",
+        "test": "node scripts/test-runner.js",
+        "test-performance": "node scripts/performance-test.js",
+        "test-compatibility": "node scripts/browser-test.js"
+    },
+    "devDependencies": {
+        "live-server": "^1.2.2",
+        "terser": "^5.16.0",
+        "clean-css-cli": "^5.6.2",
+        "imagemin": "^8.0.1",
+        "imagemin-pngquant": "^9.0.2",
+        "imagemin-mozjpeg": "^10.0.0",
+        "gh-pages": "^5.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/surajsk2003/Dungeon-Crawler-RPG.git"
+    },
+    "keywords": ["game", "rpg", "dungeon", "html5", "canvas", "javascript"],
+    "author": "Your Name",
+    "license": "MIT"
+}

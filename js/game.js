@@ -1,223 +1,311 @@
-// Core game logic
-const game = {
-    canvas: null,
-    ctx: null,
-    currentFloor: 1,
-    gameRunning: false,
-    keys: {},
-    lastTime: 0,
-    
-    init: function() {
-        canvas.init();
-        this.canvas = canvas.element;
-        this.ctx = canvas.ctx;
+class Game {
+    constructor() {
+        this.canvas = null;
+        this.ctx = null;
+        this.assetLoader = new AssetLoader();
+        this.audioManager = null;
+        this.inputManager = null;
+        this.camera = null;
+        this.ui = null;
         
-        player.init();
-        this.setupEventListeners();
-        this.generateLevel();
-    },
-    
-    start: function() {
-        this.gameRunning = true;
-        gameLoop.init();
-        gameLoop.start();
-        ui.addMessage("Game started! Use WASD to move, Space to attack, F for Fireball.", "level");
-    },
-    
-    generateLevel: function() {
-        dungeon.generate();
-        enemies.generate(this.currentFloor);
-        items.generate();
-    },
-    
-    setupEventListeners: function() {
-        // Event listeners are now handled by canvas module
-    },
-    
-    // Input handlers called by canvas module
-    handleKeyDown: function(key, code) {
-        this.keys[key.toLowerCase()] = true;
+        // Game state
+        this.state = 'loading'; // loading, menu, playing, paused, gameover
+        this.lastTime = 0;
+        this.deltaTime = 0;
+        this.fps = 0;
+        this.frameCount = 0;
         
-        if (key === ' ') {
-            this.handleAttack();
-        } else if (key.toLowerCase() === 'e') {
-            items.useHealthPotion();
-        } else if (key.toLowerCase() === 'r') {
-            items.useManaPotion();
-        } else if (key.toLowerCase() === 'f') {
-            this.handleFireball();
-        } else if (key === 'Enter') {
-            if (enemies.list.length === 0) {
-                this.nextFloor();
-            }
-        } else if (key.toLowerCase() === 'm') {
-            const muted = audio.toggleMute();
-            ui.elements.muteButton.textContent = muted ? '🔇 Sound Off' : '🔊 Sound On';
-        }
-    },
-    
-    handleKeyUp: function(key, code) {
-        this.keys[key.toLowerCase()] = false;
-    },
-    
-    handleMouseDown: function(x, y, button) {
-        // Handle mouse clicks if needed
-    },
-    
-    handleMouseUp: function(x, y, button) {
-        // Handle mouse releases if needed
-    },
-    
-    handleMouseMove: function(x, y) {
-        // Handle mouse movement if needed
-    },
-    
-    handleTouchStart: function(x, y) {
-        // Handle touch start for mobile
-    },
-    
-    handleTouchEnd: function(x, y) {
-        // Handle touch end for mobile
-    },
-    
-    handleTouchMove: function(x, y) {
-        // Handle touch movement for mobile
-    },
-    
-    handleAttack: function() {
-        if (player.attack()) {
-            enemies.takeDamage(player.data.attack);
-        }
-    },
-    
-    handleFireball: function() {
-        if (player.castFireball()) {
-            enemies.takeDamage(player.data.magicPower, 100);
-            ui.addMessage("You cast Fireball!", "combat");
-        } else if (player.data.mp < 15) {
-            ui.addMessage("Not enough mana to cast Fireball!", "combat");
-        }
-    },
-    
-    nextFloor: function() {
-        if (enemies.list.length > 0) {
-            ui.addMessage('Clear all enemies before proceeding!');
-            return;
-        }
+        // Game objects
+        this.player = null;
+        this.dungeon = null;
+        this.enemies = [];
+        this.items = [];
+        this.particles = [];
         
-        this.currentFloor++;
-        ui.addMessage(`Entering floor ${this.currentFloor}...`, 'level');
-        this.generateLevel();
-    },
-    
-    // Game loop now handled by gameLoop module
-    
-    update: function(deltaTime) {
-        if (!this.gameRunning) return;
+        // Game settings
+        this.tileSize = 32;
+        this.viewportWidth = 25;
+        this.viewportHeight = 19;
         
-        player.update(deltaTime, this.keys);
-        enemies.update(deltaTime);
-        items.checkCollisions();
-        ui.update();
-    },
-    
-    render: function(deltaTime) {
-        if (!this.gameRunning) return;
-        
-        const ctx = this.ctx;
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Camera offset to center on player
-        const cameraX = player.data.x - this.canvas.width / 2;
-        const cameraY = player.data.y - this.canvas.height / 2;
-        
-        ctx.save();
-        ctx.translate(-cameraX, -cameraY);
-        
-        this.renderDungeon(ctx);
-        this.renderItems(ctx);
-        this.renderEnemies(ctx);
-        this.renderPlayer(ctx);
-        
-        ctx.restore();
-        
-        // Render pause overlay if paused
-        if (gameLoop.isPaused) {
-            this.renderPauseOverlay(ctx);
-        }
-    },
-    
-    renderDungeon: function(ctx) {
-        const { tileSize, tiles, width, height } = dungeon.data;
-        
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const tile = tiles[y][x];
-                const tileX = x * tileSize;
-                const tileY = y * tileSize;
-                
-                if (tile === 1) { // Wall
-                    ctx.fillStyle = '#555';
-                    ctx.fillRect(tileX, tileY, tileSize, tileSize);
-                } else { // Floor
-                    ctx.fillStyle = '#2a2a2a';
-                    ctx.fillRect(tileX, tileY, tileSize, tileSize);
-                }
-            }
-        }
-    },
-    
-    renderItems: function(ctx) {
-        items.list.forEach(item => {
-            ctx.fillStyle = item.color;
-            ctx.fillRect(item.x, item.y, item.width, item.height);
-            
-            ctx.fillStyle = '#fff';
-            ctx.font = '12px monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText(item.symbol, item.x + item.width/2, item.y + item.height/2 + 4);
-        });
-    },
-    
-    renderEnemies: function(ctx) {
-        enemies.list.forEach(enemy => {
-            ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-            
-            // Health bar
-            const healthPercent = enemy.hp / enemy.maxHp;
-            ctx.fillStyle = '#333';
-            ctx.fillRect(enemy.x, enemy.y - 8, enemy.width, 4);
-            ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(enemy.x, enemy.y - 8, enemy.width * healthPercent, 4);
-        });
-    },
-    
-    renderPlayer: function(ctx) {
-        ctx.fillStyle = '#2ecc71';
-        ctx.fillRect(player.data.x, player.data.y, player.data.width, player.data.height);
-    },
-    
-    gameOver: function() {
-        this.gameRunning = false;
-        audio.play('gameover');
-        ui.addMessage('Game Over!', 'combat');
-        
-        if (typeof stateManager !== 'undefined') {
-            stateManager.setState(stateManager.states.GAMEOVER);
-        }
-    },
-    
-    renderPauseOverlay: function(ctx) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        ctx.fillStyle = '#fff';
-        ctx.font = '32px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
-        
-        ctx.font = '16px monospace';
-        ctx.fillText('Press P to resume', this.canvas.width / 2, this.canvas.height / 2 + 40);
+        this.init();
     }
-};
+
+    async init() {
+        this.setupCanvas();
+        this.setupEventListeners();
+        
+        // Load assets
+        this.assetLoader.onProgress((progress, loaded, total) => {
+            this.updateLoadingScreen(progress, loaded, total);
+        });
+        
+        await this.assetLoader.loadAllAssets();
+        
+        // Initialize systems
+        this.audioManager = new AudioManager(this.assetLoader);
+        this.inputManager = new InputManager();
+        this.camera = new Camera(this.canvas.width, this.canvas.height);
+        this.ui = new UIManager(this);
+        
+        this.setState('menu');
+        this.startGameLoop();
+    }
+
+    setupCanvas() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        
+        // Set canvas size
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+        
+        // Disable image smoothing for pixel art
+        this.ctx.imageSmoothingEnabled = false;
+    }
+
+    resizeCanvas() {
+        const maxWidth = window.innerWidth - 40;
+        const maxHeight = window.innerHeight - 40;
+        
+        const aspectRatio = this.viewportWidth / this.viewportHeight;
+        
+        let width = maxWidth;
+        let height = width / aspectRatio;
+        
+        if (height > maxHeight) {
+            height = maxHeight;
+            width = height * aspectRatio;
+        }
+        
+        this.canvas.width = this.viewportWidth * this.tileSize;
+        this.canvas.height = this.viewportHeight * this.tileSize;
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
+    }
+
+    setupEventListeners() {
+        // Menu button events
+        document.getElementById('newGameBtn').addEventListener('click', () => {
+            this.startNewGame();
+        });
+        
+        document.getElementById('loadGameBtn').addEventListener('click', () => {
+            this.loadGame();
+        });
+        
+        // Panel close events
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const panel = e.target.getAttribute('data-panel');
+                this.ui.closePanel(panel);
+            });
+        });
+    }
+
+    updateLoadingScreen(progress, loaded, total) {
+        const progressFill = document.getElementById('progressFill');
+        const loadingText = document.getElementById('loadingText');
+        
+        progressFill.style.width = progress + '%';
+        loadingText.textContent = `Loading... ${loaded}/${total}`;
+    }
+
+    setState(newState) {
+        this.state = newState;
+        
+        // Show/hide UI elements based on state
+        switch(newState) {
+            case 'loading':
+                document.getElementById('loadingScreen').classList.remove('hidden');
+                break;
+            case 'menu':
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainMenu').classList.remove('hidden');
+                document.getElementById('gameUI').classList.add('hidden');
+                break;
+            case 'playing':
+                document.getElementById('mainMenu').classList.add('hidden');
+                document.getElementById('gameUI').classList.remove('hidden');
+                break;
+        }
+    }
+
+    startNewGame() {
+        // Initialize game objects
+        this.player = new Player(100, 100, this.assetLoader);
+        this.dungeon = new Dungeon(50, 50, this.assetLoader);
+        this.enemies = [];
+        this.items = [];
+        this.particles = [];
+        
+        // Generate first level
+        this.dungeon.generateLevel(1);
+        
+        // Place player at spawn point
+        const spawn = this.dungeon.getSpawnPoint();
+        this.player.setPosition(spawn.x * this.tileSize, spawn.y * this.tileSize);
+        
+        // Start ambient music
+        this.audioManager.playMusic('ambient_music');
+        
+        this.setState('playing');
+    }
+
+    startGameLoop() {
+        const gameLoop = (currentTime) => {
+            this.deltaTime = currentTime - this.lastTime;
+            this.lastTime = currentTime;
+            
+            // Calculate FPS
+            this.frameCount++;
+            if (this.frameCount % 60 === 0) {
+                this.fps = Math.round(1000 / this.deltaTime);
+            }
+            
+            this.update(this.deltaTime);
+            this.render();
+            
+            requestAnimationFrame(gameLoop);
+        };
+        
+        requestAnimationFrame(gameLoop);
+    }
+
+    update(deltaTime) {
+        if (this.state !== 'playing') return;
+        
+        // Update game objects
+        this.player?.update(deltaTime, this.inputManager, this.dungeon);
+        
+        this.enemies.forEach(enemy => {
+            enemy.update(deltaTime, this.player, this.dungeon);
+        });
+        
+        this.items.forEach(item => {
+            item.update(deltaTime);
+        });
+        
+        this.particles.forEach((particle, index) => {
+            particle.update(deltaTime);
+            if (particle.isDead()) {
+                this.particles.splice(index, 1);
+            }
+        });
+        
+        // Update camera to follow player
+        if (this.player) {
+            this.camera.followTarget(this.player.x, this.player.y);
+            this.camera.update(deltaTime);
+        }
+        
+        // Update UI
+        this.ui.update();
+    }
+
+    render() {
+        // Clear canvas
+        this.ctx.fillStyle = '#000000';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        if (this.state !== 'playing') return;
+        
+        // Save context for camera transforms
+        this.ctx.save();
+        
+        // Apply camera transform
+        this.ctx.translate(-this.camera.x, -this.camera.y);
+        
+        // Render dungeon
+        this.dungeon?.render(this.ctx, this.camera);
+        
+        // Render items
+        this.items.forEach(item => {
+            if (this.camera.isVisible(item.x, item.y, this.tileSize, this.tileSize)) {
+                item.render(this.ctx);
+            }
+        });
+        
+        // Render enemies
+        this.enemies.forEach(enemy => {
+            if (this.camera.isVisible(enemy.x, enemy.y, this.tileSize, this.tileSize)) {
+                enemy.render(this.ctx);
+            }
+        });
+        
+        // Render player
+        this.player?.render(this.ctx);
+        
+        // Render particles
+        this.particles.forEach(particle => {
+            particle.render(this.ctx);
+        });
+        
+        // Restore context
+        this.ctx.restore();
+        
+        // Render UI (always on top)
+        this.renderDebugInfo();
+    }
+
+    renderDebugInfo() {
+        if (this.state !== 'playing') return;
+        
+        this.ctx.fillStyle = '#00ff00';
+        this.ctx.font = '14px monospace';
+        this.ctx.fillText(`FPS: ${this.fps}`, 10, 25);
+        this.ctx.fillText(`Enemies: ${this.enemies.length}`, 10, 45);
+        this.ctx.fillText(`Particles: ${this.particles.length}`, 10, 65);
+        
+        if (this.player) {
+            const tileX = Math.floor(this.player.x / this.tileSize);
+            const tileY = Math.floor(this.player.y / this.tileSize);
+            this.ctx.fillText(`Player: (${tileX}, ${tileY})`, 10, 85);
+        }
+    }
+
+    addEnemy(enemy) {
+        this.enemies.push(enemy);
+    }
+
+    removeEnemy(enemy) {
+        const index = this.enemies.indexOf(enemy);
+        if (index > -1) {
+            this.enemies.splice(index, 1);
+        }
+    }
+
+    addItem(item) {
+        this.items.push(item);
+    }
+
+    removeItem(item) {
+        const index = this.items.indexOf(item);
+        if (index > -1) {
+            this.items.splice(index, 1);
+        }
+    }
+
+    addParticle(particle) {
+        this.particles.push(particle);
+    }
+
+    saveGame() {
+        const saveData = {
+            player: this.player.serialize(),
+            dungeon: this.dungeon.serialize(),
+            timestamp: Date.now()
+        };
+        
+        localStorage.setItem('dungeonCrawlerSave', JSON.stringify(saveData));
+    }
+
+    loadGame() {
+        const saveData = localStorage.getItem('dungeonCrawlerSave');
+        if (saveData) {
+            const data = JSON.parse(saveData);
+            // Implement load logic
+        }
+    }
+}
+
+window.Game = Game;
